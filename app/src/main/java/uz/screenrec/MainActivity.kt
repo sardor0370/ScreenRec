@@ -17,6 +17,7 @@ import android.util.DisplayMetrics
 import android.view.Gravity
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import kotlin.math.max
 import kotlin.math.min
@@ -95,15 +96,31 @@ class MainActivity : Activity() {
         }
         orientBtn = button("") { landscape = !landscape; refresh() }
         root.addView(orientBtn)
+        // Mikrofon va Ekran tovushi yonma-yon
+        val row = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { bottomMargin = dp(12) }
+        }
         micBtn = button("") { toggleMic() }
-        root.addView(micBtn)
         gameBtn = button("") { toggleGame() }
-        root.addView(gameBtn)
+        micBtn.layoutParams = LinearLayout.LayoutParams(0, dp(60), 1f).apply { rightMargin = dp(6) }
+        gameBtn.layoutParams = LinearLayout.LayoutParams(0, dp(60), 1f).apply { leftMargin = dp(6) }
+        row.addView(micBtn)
+        row.addView(gameBtn)
+        root.addView(row)
 
         startBtn = button("") { onStartStop() }
         root.addView(startBtn)
 
-        setContentView(root)
+        // kichik ekranlarda ham hamma tugma ko'rinishi uchun aylantiriladigan qilamiz
+        val scroll = ScrollView(this).apply {
+            setBackgroundColor(Color.parseColor("#0E1116"))
+            isFillViewport = true
+            addView(root)
+        }
+        setContentView(scroll)
         refresh()
     }
 
@@ -123,10 +140,10 @@ class MainActivity : Activity() {
             b.isEnabled = !rec
         }
         orientBtn.text = if (landscape) "Yo'nalish: Gorizontal (o'yin)" else "Yo'nalish: Vertikal"
-        micBtn.text = if (mic) "Mikrofon: YOQILGAN" else "Mikrofon: o'chiq"
+        micBtn.text = if (mic) "Mikrofon\nYOQILGAN" else "Mikrofon\no'chiq"
         paint(orientBtn, "#1F2630", Color.WHITE)
         paint(micBtn, if (mic) "#F5B301" else "#1F2630", if (mic) Color.BLACK else Color.WHITE)
-        gameBtn.text = if (game) "O'yin tovushi: YOQILGAN" else "O'yin tovushi: o'chiq"
+        gameBtn.text = if (game) "Ekran tovushi\nYOQILGAN" else "Ekran tovushi\no'chiq"
         paint(gameBtn, if (game) "#F5B301" else "#1F2630", if (game) Color.BLACK else Color.WHITE)
         gameBtn.isEnabled = !rec
         orientBtn.isEnabled = !rec
